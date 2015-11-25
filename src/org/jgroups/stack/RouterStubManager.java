@@ -40,6 +40,7 @@ import org.jgroups.annotations.GuardedBy;
 import org.jgroups.logging.Log;
 import org.jgroups.logging.LogFactory;
 import org.jgroups.util.TimeScheduler;
+import org.jgroups.util.Util;
 
 public class RouterStubManager implements RouterStub.ConnectionListener {
 
@@ -76,25 +77,30 @@ public class RouterStubManager implements RouterStub.ConnectionListener {
     
     public RouterStub createAndRegisterStub(String routerHost, int routerPort, InetAddress bindAddress) {
         RouterStub s = new RouterStub(routerHost,routerPort,bindAddress,this);
+        if (log.isDebugEnabled()) log.debug("NC Creating stub " + s);                        
         unregisterAndDestroyStub(s.getGossipRouterAddress());       
         stubs.add(s);   
         return s;
     }
     
     public void registerStub(RouterStub s) {        
+        if (log.isDebugEnabled()) log.debug("NC Registering stub " + s);                        
         unregisterAndDestroyStub(s.getGossipRouterAddress());        
         stubs.add(s);           
     }
     
     public boolean unregisterStub(final RouterStub s) {
+        if (log.isDebugEnabled()) log.debug("NC Unregistering stub " + s);                        
         return stubs.remove(s);
     }
     
     public RouterStub unregisterStub(final InetSocketAddress address) {
+        if (log.isDebugEnabled()) log.debug("NC Disconnecting stub with address " + address);                        
         if(address == null) 
             throw new IllegalArgumentException("Cannot remove null address");
         for (RouterStub s : stubs) {
             if (s.getGossipRouterAddress().equals(address)) {
+                if (log.isDebugEnabled()) log.debug("NC Removing stub " + s + "with address " + address);                        
                 stubs.remove(address);
                 return s;
             }
@@ -114,6 +120,7 @@ public class RouterStubManager implements RouterStub.ConnectionListener {
     public void disconnectStubs() {
         for (RouterStub stub : stubs) {
             try {
+                if (log.isDebugEnabled()) log.debug("NC Disconnecting stub " + stub);                        
                 stub.disconnect(channelName, logicalAddress);                
             } catch (Exception e) {
             }
@@ -141,13 +148,13 @@ public class RouterStubManager implements RouterStub.ConnectionListener {
             final Runnable reconnector = new Runnable() {
                 public void run() {
                     try {
-                        if (log.isTraceEnabled()) log.trace("Reconnecting " + stub);                        
+                        if (log.isDebugEnabled()) log.debug("Reconnecting " + stub);                        
                         String logical_name = org.jgroups.util.UUID.get(logicalAddress);
                         PhysicalAddress physical_addr = (PhysicalAddress) owner.down(new Event(
                                         Event.GET_PHYSICAL_ADDRESS, logicalAddress));
                         List<PhysicalAddress> physical_addrs = Arrays.asList(physical_addr);
                         stub.connect(channelName, logicalAddress, logical_name, physical_addrs);
-                        if (log.isTraceEnabled()) log.trace("Reconnected " + stub);                        
+                        if (log.isDebugEnabled()) log.debug("Reconnected " + stub);                        
                     } catch (Throwable ex) {
                         if (log.isWarnEnabled())
                             log.warn("failed reconnecting stub to GR at "+ stub.getGossipRouterAddress() + ": " + ex);
@@ -174,9 +181,9 @@ public class RouterStubManager implements RouterStub.ConnectionListener {
             final Runnable pinger = new Runnable() {
                 public void run() {
                     try {
-                        if(log.isTraceEnabled()) log.trace("Pinging " + stub);                        
+                        if(log.isDebugEnabled()) log.debug("Pinging " + stub);                        
                         stub.checkConnection();
-                        if(log.isTraceEnabled()) log.trace("Pinged " + stub);                        
+                        if(log.isDebugEnabled()) log.debug("Pinged " + stub);                        
                     } catch (Throwable ex) {
                         if (log.isWarnEnabled())
                             log.warn("failed pinging stub, GR at " + stub.getGossipRouterAddress()+ ": " + ex);
@@ -193,10 +200,12 @@ public class RouterStubManager implements RouterStub.ConnectionListener {
 
     public void connectionStatusChange(RouterStub stub, RouterStub.ConnectionStatus newState) {
         if (newState == RouterStub.ConnectionStatus.CONNECTION_BROKEN) {
+            if (log.isDebugEnabled()) log.debug("NC Connection broke with stub " + stub);                        
             stub.interrupt();
             stub.destroy();
             startReconnecting(stub);
         } else if (newState == RouterStub.ConnectionStatus.CONNECTED) {
+            if (log.isDebugEnabled()) log.debug("NC Connection established with stub " + stub);                        
             stopReconnecting(stub);
         } else if (newState == RouterStub.ConnectionStatus.DISCONNECTED) {
             // wait for disconnect ack;
@@ -209,5 +218,9 @@ public class RouterStubManager implements RouterStub.ConnectionListener {
     
     public static RouterStubManager emptyGossipClientStubManager(Protocol p) {
         return new RouterStubManager(p);
+    }
+
+    public String printStubs() {
+        return Util.printListWithDelimiter(stubs, ", ");
     }
 }

@@ -5,6 +5,7 @@ import java.io.DataInputStream;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -16,6 +17,7 @@ import org.jgroups.Global;
 import org.jgroups.Message;
 import org.jgroups.PhysicalAddress;
 import org.jgroups.annotations.Experimental;
+import org.jgroups.annotations.ManagedOperation;
 import org.jgroups.annotations.Property;
 import org.jgroups.stack.GossipData;
 import org.jgroups.stack.GossipRouter;
@@ -77,7 +79,7 @@ public class TUNNEL extends TP {
 
    private DatagramSocket sock;
    
-   private volatile RouterStubManager stubManager;
+   protected volatile RouterStubManager stubManager;
 
    public TUNNEL() {
    }
@@ -86,7 +88,7 @@ public class TUNNEL extends TP {
         return false;
     }
 
-    @Property
+   @Property(description="A comma-separated list of GossipRouter hosts, e.g. HostA[12001],HostB[12001]")
    public void setGossipRouterHosts(String hosts) throws UnknownHostException {
       gossip_router_hosts.clear();
       // if we get passed value of List<SocketAddress>#toString() we have to strip []
@@ -95,6 +97,14 @@ public class TUNNEL extends TP {
       }
       gossip_router_hosts.addAll(Util.parseCommaDelimitedHosts2(hosts, 1));
    }
+
+   @ManagedOperation(description="Prints all currently connected stubs")
+   public String printStubs() {
+       RouterStubManager mgr=stubManager;
+       return mgr != null? mgr.printStubs() : "n/a";
+   }
+
+   public RouterStubManager getStubManager() {return stubManager;}
 
    public String toString() {
       return "TUNNEL";
@@ -240,14 +250,17 @@ public class TUNNEL extends TP {
 
         public void connectionStatusChange(RouterStub stub, RouterStub.ConnectionStatus newState) {
             super.connectionStatusChange(stub, newState);
-            if (newState == RouterStub.ConnectionStatus.CONNECTED) {               
+            if (newState == RouterStub.ConnectionStatus.CONNECTED) {
+                if (log.isDebugEnabled()) log.debug("NC Connection established with stub " + stub);
                 StubReceiver stubReceiver = new StubReceiver(stub);
                 stub.setReceiver(stubReceiver);
                 Thread t = global_thread_factory.newThread(stubReceiver, "TUNNEL receiver for " + stub.toString());
                 stubReceiver.setThread(t);
                 t.setDaemon(true);
                 t.start();
-            } 
+            } else {
+                log.warn("NC Unhandled connection status change: " + newState.toString() + "; stub: " + stub);
+            }
         }
     }
 
@@ -296,6 +309,8 @@ public class TUNNEL extends TP {
                             }
                             break;
                     }
+                }catch (SocketException ioe) {   
+                    break;  
                 }catch (Exception ioe) {     
                     if(stub.isConnected())
                         continue mainloop;
