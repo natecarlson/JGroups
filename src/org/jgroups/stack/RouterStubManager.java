@@ -82,7 +82,7 @@ public class RouterStubManager implements RouterStub.ConnectionListener {
     
     public void registerStub(RouterStub s) {        
         if (log.isDebugEnabled()) log.debug("NC Registering stub " + s);                        
-        unregisterAndDestroyStub(s.getGossipRouterAddress());        
+        unregisterAndDestroyStub(s);        
         stubs.add(s);           
     }
     

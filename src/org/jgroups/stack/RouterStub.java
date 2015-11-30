@@ -226,7 +226,7 @@ public class RouterStub implements Comparable<RouterStub> {
             request.writeTo(output);
             output.flush();
         }
-        catch(IOException e) {
+        catch(Exception e) {
             connectionStateChanged(ConnectionStatus.CONNECTION_BROKEN);
         }
         finally {
