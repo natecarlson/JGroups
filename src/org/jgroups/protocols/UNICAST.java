@@ -445,12 +445,12 @@ public class UNICAST extends Protocol implements AckSenderWindow.RetransmitComma
         return down_prot.down(evt);          // Pass on to the layer below us
     }
 
-
-    private void send(Message msg, Event evt) {
-        down_prot.down(evt);
-        num_msgs_sent++;
-        num_bytes_sent+=msg.getLength();
-    }
+    // Backported patch removes this.. is this used?!
+    //private void send(Message msg, Event evt) {
+    //    down_prot.down(evt);
+    //    num_msgs_sent++;
+    //    num_bytes_sent+=msg.getLength();
+    //}
 
     /**
      * Removes and resets from connection table (which is already locked). Returns true if member was found,
