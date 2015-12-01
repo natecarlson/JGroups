@@ -34,6 +34,9 @@ import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
+// For Nate's Hack stuff
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Manages a list of RouterStubs (e.g. health checking, reconnecting etc.
@@ -54,6 +57,9 @@ public class RouterStubManager implements RouterStub.ConnectionListener {
 
     protected final Log log;
 
+    // Timer for Nate's hack stuff..
+    protected Timer hacktimer=null;
+
     public RouterStubManager(Protocol owner, String channelName, Address logicalAddress, long interval) {
         this.owner = owner;
         this.stubs = new CopyOnWriteArrayList<RouterStub>();
@@ -62,6 +68,22 @@ public class RouterStubManager implements RouterStub.ConnectionListener {
         this.channelName = channelName;
         this.logicalAddress = logicalAddress;
         this.interval = interval;
+
+        final String hackChannelName = channelName;
+
+        // Nate's hack stuff to print debug messages
+        long printStubsInterval = 5000;
+        if (printStubsInterval > 0) {
+            hacktimer = new Timer(true);
+            hacktimer.schedule(new TimerTask() {
+                public void run() {
+                    if (hackChannelName != null) {
+                        log.debug("Current router stubs for channel " + hackChannelName + ": " + printStubs());
+                    }
+                }
+            }, printStubsInterval, printStubsInterval);
+        }
+
     }
     
     private RouterStubManager(Protocol p) {
