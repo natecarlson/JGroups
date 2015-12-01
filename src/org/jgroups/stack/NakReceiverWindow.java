@@ -241,6 +241,7 @@ public class NakReceiverWindow {
     public boolean add(final long seqno, final Message msg) {
         long old_next, next_to_add;
         int num_xmits=0;
+        boolean missing_msg_received=false;
 
         lock.writeLock().lock();
         try {
@@ -270,6 +271,7 @@ public class NakReceiverWindow {
                 if(existing != null)
                     return false; // key/value was present
                 num_xmits=retransmitter.remove(seqno);
+                missing_msg_received = true;
                 if(log.isTraceEnabled())
                     log.trace(new StringBuilder("added missing msg ").append(msg.getSrc()).append('#').append(seqno));
                 return true;
@@ -290,7 +292,7 @@ public class NakReceiverWindow {
             lock.writeLock().unlock();
         }
 
-        if(listener != null && num_xmits > 0) {
+        if(listener != null && missing_msg_received) {
             try {listener.missingMessageReceived(seqno, msg.getSrc());} catch(Throwable t) {}
         }
 
