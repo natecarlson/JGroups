@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+// Used for Nate's hack stuff
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.jgroups.Address;
 import org.jgroups.Event;
@@ -80,6 +83,9 @@ public class TUNNEL extends TP {
    private DatagramSocket sock;
    
    protected volatile RouterStubManager stubManager;
+
+   // Timer for Nate's hack stuff..
+   protected Timer hacktimer=null;
 
    public TUNNEL() {
    }
@@ -182,6 +188,20 @@ public class TUNNEL extends TP {
         
         // loopback turned on is mandatory
         loopback = true;
+            
+        // Nate's hack stuff to print debug messages
+        long printStubsInterval = 5000;
+        if (printStubsInterval > 0) {
+            hacktimer = new Timer(true);
+            hacktimer.schedule(new TimerTask() {
+                public void run() {
+                    RouterStubManager mgr=stubManager;
+                    if (mgr != null) {
+                        log.debug("Current router stubs: " + mgr.printStubs());
+                   }
+                }
+            }, printStubsInterval, printStubsInterval);
+        }
     }
     
     public void destroy() {        
