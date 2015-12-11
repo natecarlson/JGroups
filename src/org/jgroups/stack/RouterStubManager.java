@@ -96,7 +96,7 @@ public class RouterStubManager implements RouterStub.ConnectionListener {
     
     public RouterStub createAndRegisterStub(String routerHost, int routerPort, InetAddress bindAddress) {
         RouterStub s = new RouterStub(routerHost,routerPort,bindAddress,this);
-        if (log.isDebugEnabled()) log.debug("NC Creating stub " + s);                        
+        if (log.isDebugEnabled()) log.debug("NC Creating stub " + s);
         unregisterAndDestroyStub(s);       
         stubs.add(s);   
         return s;
@@ -104,8 +104,8 @@ public class RouterStubManager implements RouterStub.ConnectionListener {
     
     public void registerStub(RouterStub s) {        
         if (log.isDebugEnabled()) log.debug("NC Registering stub " + s);                        
-        unregisterAndDestroyStub(s);        
-        stubs.add(s);           
+        unregisterAndDestroyStub(s);
+        stubs.add(s);
     }
     
     public RouterStub unregisterStub(final RouterStub stub) {
@@ -159,13 +159,13 @@ public class RouterStubManager implements RouterStub.ConnectionListener {
         final Runnable reconnector = new Runnable() {
             public void run() {
                 try {
-                    if (log.isDebugEnabled()) log.debug("Reconnecting " + stub);                        
+                    if (log.isDebugEnabled()) log.debug("Reconnecting " + stub);
                     String logical_name = org.jgroups.util.UUID.get(logicalAddress);
                     PhysicalAddress physical_addr = (PhysicalAddress) owner.down(new Event(
                                     Event.GET_PHYSICAL_ADDRESS, logicalAddress));
                     List<PhysicalAddress> physical_addrs = Arrays.asList(physical_addr);
                     stub.connect(channelName, logicalAddress, logical_name, physical_addrs);
-                    if (log.isDebugEnabled()) log.debug("Reconnected " + stub);                        
+                    if (log.isDebugEnabled()) log.debug("Reconnected " + stub);
                 } catch (Throwable ex) {
                     if (log.isWarnEnabled())
                         log.warn("failed reconnecting stub to GR at "+ stub.getGossipRouterAddress() + ": " + ex);

@@ -242,7 +242,7 @@ public class TUNNEL extends TP {
                 t.setDaemon(true);
                 t.start();
             } else {
-                log.warn("NC Unhandled connection status change: " + newState.toString() + "; stub: " + stub);
+                log.warn("Connection status change: " + newState.toString() + "; stub: " + stub);
             }
         }
     }
@@ -371,8 +371,8 @@ public class TUNNEL extends TP {
       public void sendToAllMembers(List<RouterStub> stubs, String group, byte[] data, int offset, int length)
                throws Exception {
          boolean sent = false;
-          if(stubs.size() > 1)
-              Collections.shuffle(stubs);  // todo: why is this needed ?
+         // if(stubs.size() > 1)
+         //     Collections.shuffle(stubs);  // todo: why is this needed ?
          for (RouterStub stub : stubs) {
             try {
                 if(!stub.isConnected())
@@ -393,8 +393,8 @@ public class TUNNEL extends TP {
 
       public void sendToSingleMember(List<RouterStub> stubs, String group, Address dest, byte[] data, int offset, int length) throws Exception {
          boolean sent = false;
-          if(stubs.size() > 1)
-              Collections.shuffle(stubs); 
+         // if(stubs.size() > 1)
+         //     Collections.shuffle(stubs); 
          for (RouterStub stub : stubs) {
             try {
                 if(!stub.isConnected())
@@ -416,13 +416,15 @@ public class TUNNEL extends TP {
       }
 
        public void connect(List<RouterStub> stubs, String group, Address addr, String logical_name, List<PhysicalAddress> phys_addrs) {
+           if(log.isDebugEnabled()) log.debug("Group " + group + " - connecting to GossipRouters, stubs: " + stubs);
            for (RouterStub stub : stubs) {
                try {
+                   if(log.isDebugEnabled()) log.debug("Group " + group + " - connecting to GossipRouter: " + stub);
                    stub.connect(group, addr, logical_name, phys_addrs);
                }
                catch (Exception e) {
                    if (log.isWarnEnabled())
-                       log.warn("Failed connecting to GossipRouter at " + stub.getGossipRouterAddress());
+                       log.warn("Group " + group + "Failed connecting to GossipRouter at " + stub.getGossipRouterAddress());
                    stubManager.startReconnecting(stub);
                }
            }
