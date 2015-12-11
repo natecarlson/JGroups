@@ -1,4 +1,13 @@
+Details about this branch:
+--------------------------
 
+NOTE: This branch is being used to pull in updates from upstream back to 2.12.x,
+to try to get the TUNNEL protocol with GossipRouters to behave nicer on an app that
+we can't migrate to 3.x yet.
+
+
+Original README:
+----------------
 
 
        JGroups - A Framework for Group Communication in Java
