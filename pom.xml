@@ -25,7 +25,7 @@
 
     <scm>
       <connection>scm:https://github.com/natecarlson/JGroups-2.12-Tunnel.git</connection>
-      <branch>LAKANA_JGroups_2_12_tunnel_stability</branch>
+      <tag>LAKANA_JGroups_2_12_tunnel_stability</tag>
     </scm>
 
     <distributionManagement>
