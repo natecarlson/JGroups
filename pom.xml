@@ -24,31 +24,27 @@
     </licenses>
 
     <scm>
-      <connection>scm:https://github.com/natecarlson/JGroups-2.12-Tunnel.git</connection>
+      <connection>scm:https://github.com/teamlakana/JGroups-2.12-Tunnel.git</connection>
       <tag>LAKANA_JGroups_2_12_tunnel_stability</tag>
     </scm>
 
     <distributionManagement>
-        <repository>
-            <uniqueVersion>false</uniqueVersion>
-            <id>cm-nexus-releases</id>
-            <name>IB Releases</name>
-            <url>https://cm-nexus.ibsys.com/nexus/content/repositories/releases/</url>
-        </repository>
-
-        <snapshotRepository>
-            <uniqueVersion>false</uniqueVersion>
-            <id>cm-nexus-snapshots</id>
-            <name>IB Snapshots</name>
-            <url>https://cm-nexus.ibsys.com/nexus/content/repositories/snapshots/</url>
-        </snapshotRepository>
+      <repository>
+        <uniqueVersion>false</uniqueVersion>
+        <id>platform-releases</id>
+        <url>https://nexus.lakana.com/content/repositories/platform-releases/</url>
+      </repository>
+      <snapshotRepository>
+        <uniqueVersion>false</uniqueVersion>
+        <id>platform-snapshots</id>
+        <url>https://nexus.lakana.com/content/repositories/platform-snapshots/</url>
+      </snapshotRepository>
     </distributionManagement>
 
     <repositories>
         <repository>
-            <id>ibsys-public</id>
-            <name>IB Public</name>
-            <url>https://cm-nexus.ibsys.com/nexus/content/groups/public</url>
+            <id>lakana-public</id>
+            <url>https://nexus.lakana.com/content/groups/public</url>
             <layout>default</layout>
             <releases>
                 <enabled>true</enabled>
