@@ -28,19 +28,6 @@
       <tag>LAKANA_JGroups_2_12_tunnel_stability</tag>
     </scm>
 
-    <distributionManagement>
-      <repository>
-        <uniqueVersion>false</uniqueVersion>
-        <id>platform-releases</id>
-        <url>https://nexus.lakana.com/content/repositories/platform-releases/</url>
-      </repository>
-      <snapshotRepository>
-        <uniqueVersion>false</uniqueVersion>
-        <id>platform-snapshots</id>
-        <url>https://nexus.lakana.com/content/repositories/platform-snapshots/</url>
-      </snapshotRepository>
-    </distributionManagement>
-
     <repositories>
         <repository>
             <id>lakana-public</id>
@@ -85,6 +72,46 @@
             <scope>test</scope>
         </dependency> -->
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>standard-repo</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>platform-snapshots</id>
+                    <name>Snapshot Repository</name>
+                    <url>https://nexus.lakana.com/content/repositories/platform-snapshots</url>
+                </snapshotRepository>
+                <repository>
+                    <id>platform-releases</id>
+                    <name>Release Repository</name>
+                    <url>https://nexus.lakana.com/content/repositories/platform-releases</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+        <profile>
+            <id>client-repo</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <distributionManagement>
+                <repository>
+                    <id>client-platform-releases</id>
+                    <name>Client Release Repository</name>
+                    <url>https://clientnexus.lakana.com/content/repositories/platform-releases</url>
+                </repository>
+                <snapshotRepository>
+                    <id>client-platform-snapshots</id>
+                    <name>Client Snapshot Repository</name>
+                    <url>https://nexus.lakana.com/content/repositories/platform-snapshots</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+    </profiles>
+
     <build>
         <sourceDirectory>src</sourceDirectory>
         <resources>
